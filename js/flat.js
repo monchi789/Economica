@@ -12,41 +12,45 @@ btnCalcular.addEventListener("click", () => {
 // Function to calculate the monthly payment
 function calcularCuota(monto, interes, tiempo) {
   // Validate the input
-  if (monto >= 1000 && monto <= 50000 && interes >= 1 && interes <= 4 && tiempo >= 6 && tiempo <= 24) {
+  if (
+    monto >= 1000 &&
+    monto <= 50000 &&
+    interes >= 1 &&
+    interes <= 4 &&
+    tiempo >= 6 &&
+    tiempo <= 24
+  ) {
     while (llenarTabla.firstChild) {
       llenarTabla.removeChild(llenarTabla.firstChild);
     }
 
-    let fechas = [];
     let fechaActual = Date.now();
     let mes_actual = moment(fechaActual);
     mes_actual.add(1, "month");
 
-    let pagoInteres = 0,
-      pagoCapital = 0,
-      cuota = 0;
+    let amortizacionConstante = 0,
+      pagoInteres = 0,
+      cuota = 0,
+      montoPagar = 0;
 
-    cuota =
-      (monto * ((Math.pow(1 + interes / 100, tiempo) * interes) / 100)) /
-      (Math.pow(1 + interes / 100, tiempo) - 1);
-    //cuota = monto*((interes*Math.pow(1+interes,tiempo))/(Math.pow(1+interes,tiempo)-1));
-
+    pagoInteres = parseFloat(monto * (interes / 100));
+    cuota = pagoInteres + monto / tiempo;
+    monto = parseFloat(monto - amortizacionConstante);
+    amortizacionConstante = parseFloat(monto / tiempo);
     for (let i = 1; i <= tiempo; i++) {
-      pagoInteres = parseFloat(monto * (interes / 100));
-      pagoCapital = cuota - pagoInteres;
-      monto = parseFloat(monto - pagoCapital);
+      monto = parseFloat(monto - amortizacionConstante);
 
       // Format dates
-      fechas[i] = mes_actual.format("DD-MM-YYYY");
+      let fecha = mes_actual.format("DD-MM-YYYY");
       mes_actual.add(1, "month");
 
       const row = document.createElement("tr");
       row.innerHTML = `
               <td>${i}</td>
-              <td>${fechas[i]}</td>
-              <td>${"S/. " + cuota.toFixed(3)}</td>
+              <td>${fecha}</td>
+              <td>${cuota.toFixed(2)}</td>
               <td>${pagoInteres.toFixed(2)}</td>
-              <td>${pagoCapital.toFixed(2)}</td>
+              <td>${amortizacionConstante.toFixed(2)}</td>
               <td>${monto.toFixed(2)}</td>
           `;
       llenarTabla.appendChild(row);
